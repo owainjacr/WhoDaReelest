@@ -1,0 +1,438 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Who da reelest! — Roulette Wheel</title>
+  <style>
+    :root{
+      --bg:#020617;
+      --panel:#0b1220;
+      --border:#1e293b;
+      --text:#e5e7eb;
+      --muted:#94a3b8;
+      --accent:#6366f1;
+      --shadow: rgba(0,0,0,.45);
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      min-height:100vh;
+      display:grid;
+      place-items:center;
+      background:
+        radial-gradient(900px 420px at 50% -12%, #0f172a, transparent),
+        radial-gradient(700px 360px at 10% 110%, #134e4a, transparent),
+        var(--bg);
+      color:var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+    }
+    .wrap{
+      width:min(980px, 92vw);
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap:18px;
+      align-items:start;
+    }
+    @media (max-width: 860px){ .wrap{ grid-template-columns:1fr; } }
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+      border:1px solid var(--border);
+      border-radius:18px;
+      box-shadow: 0 18px 40px var(--shadow);
+      padding:18px;
+    }
+    h1{
+      margin:0 0 8px;
+      font-size:22px;
+      letter-spacing:.2px;
+    }
+    p{
+      margin:0 0 12px;
+      color:var(--muted);
+      line-height:1.5;
+      font-size:14px;
+    }
+    .stage{
+      position:relative;
+      display:grid;
+      place-items:center;
+      padding:10px;
+      min-height: 430px;
+    }
+    .wheelShell{
+      position:relative;
+      width:min(440px, 84vw);
+      aspect-ratio:1/1;
+      border-radius:50%;
+      filter: drop-shadow(0 18px 22px rgba(0,0,0,.45));
+    }
+    canvas{
+      width:100%;
+      height:100%;
+      display:block;
+      border-radius:50%;
+      border: 10px solid rgba(255,255,255,.06);
+      background: rgba(255,255,255,.02);
+    }
+    .pointer{
+      position:absolute;
+      top:-7px;
+      left:50%;
+      transform:translateX(-50%);
+      width:0; height:0;
+      border-left:16px solid transparent;
+      border-right:16px solid transparent;
+      border-top:28px solid #f8fafc;
+      filter: drop-shadow(0 6px 10px rgba(0,0,0,.45));
+      z-index:5;
+    }
+    .pointer::after{
+      content:"";
+      position:absolute;
+      top:-34px;
+      left:-7px;
+      width:14px;
+      height:14px;
+      background:#f8fafc;
+      border-radius:50%;
+      box-shadow: 0 6px 12px rgba(0,0,0,.35);
+    }
+    .controls{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:10px;
+      align-items:center;
+    }
+    button{
+      appearance:none;
+      border:none;
+      cursor:pointer;
+      border-radius:12px;
+      padding:12px 14px;
+      font-weight:800;
+      background: var(--accent);
+      color:white;
+      box-shadow: 0 10px 22px rgba(99,102,241,.28);
+      transition: transform .08s ease, filter .15s ease;
+    }
+    button:active{ transform: translateY(1px) scale(.99); }
+    button:disabled{
+      cursor:not-allowed;
+      filter:saturate(.4) brightness(.85);
+      box-shadow:none;
+    }
+    .ghost{
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+      box-shadow:none;
+    }
+    .result{
+      margin-top:14px;
+      padding:14px;
+      border-radius:14px;
+      border:1px solid var(--border);
+      background: rgba(2,6,23,.35);
+    }
+    .result .label{
+      font-size:12px;
+      color:var(--muted);
+      letter-spacing:.35px;
+      text-transform:uppercase;
+    }
+    .result .value{
+      font-size:22px;
+      font-weight:900;
+      margin-top:6px;
+    }
+    .small{
+      margin-top:10px;
+      font-size:12px;
+      color:var(--muted);
+      line-height:1.45;
+    }
+    .list{
+      margin:10px 0 0;
+      padding:0;
+      list-style:none;
+      max-height: 320px;
+      overflow:auto;
+      border-radius:12px;
+      border:1px solid var(--border);
+      background: rgba(2,6,23,.25);
+    }
+    .list li{
+      padding:10px 12px;
+      border-bottom:1px solid rgba(148,163,184,.12);
+      font-size:13px;
+      color: var(--text);
+    }
+    .list li:last-child{ border-bottom:none; }
+    .badge{
+      display:inline-block;
+      padding:4px 10px;
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,.20);
+      background: rgba(2,6,23,.35);
+      font-size:12px;
+      color:var(--muted);
+      margin-left:8px;
+      vertical-align:middle;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>Who da reelest! <span class="badge">roulette wheel</span></h1>
+      <p>Spin the wheel</p>
+
+      <div class="stage">
+        <div class="wheelShell" aria-label="Roulette wheel">
+          <div class="pointer" aria-hidden="true"></div>
+          <canvas id="wheel" width="900" height="900"></canvas>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button id="spinBtn">Spin</button>
+        <button id="resetBtn" class="ghost">Reset</button>
+      </div>
+
+      <div class="result" role="status" aria-live="polite">
+        <div class="label">Result</div>
+        <div class="value" id="resultValue">—</div>
+        <div class="small" id="resultHint"></div>
+      </div>
+
+      <div class="small">
+        You can edit the <code>NAMES</code> array in this file to change the segment labels.
+      </div>
+    </div>
+
+    <div class="card">
+      <h1>Names on the wheel</h1>
+      <p>Segment labels currently drawn on the wheel.</p>
+      <ul class="list" id="namesList"></ul>
+    </div>
+  </div>
+
+<script>
+(() => {
+  // Real, non-white male celebrities (segment labels)
+  const NAMES = [
+    "Dwayne Johnson",
+    "Will Smith",
+    "Idris Elba",
+    "Mahershala Ali",
+    "Jamie Foxx",
+    "Michael B. Jordan",
+    "Donald Glover",
+    "Chiwetel Ejiofor",
+    "Oscar Isaac",
+    "Rami Malek",
+    "Dev Patel",
+    "Riz Ahmed",
+    "Simu Liu",
+    "Steven Yeun",
+    "John Boyega",
+    "Bad Bunny",
+    "The Weeknd",
+    "Drake",
+    "J Balvin",
+    "Jason Momoa"
+  ];
+
+  const FIXED_RESULT = "Guy Morgan";
+
+  const canvas = document.getElementById("wheel");
+  const ctx = canvas.getContext("2d");
+
+  const spinBtn = document.getElementById("spinBtn");
+  const resetBtn = document.getElementById("resetBtn");
+  const resultValue = document.getElementById("resultValue");
+  const resultHint = document.getElementById("resultHint");
+  const namesList = document.getElementById("namesList");
+
+  // Populate the side list
+  namesList.innerHTML = "";
+  NAMES.forEach(name => {
+    const li = document.createElement("li");
+    li.textContent = name;
+    namesList.appendChild(li);
+  });
+
+  // Wheel state
+  let currentRotation = 0; // radians
+  let isSpinning = false;
+  let rafId = null;
+
+  const TAU = Math.PI * 2;
+
+  function normalize(rad){
+    rad = rad % TAU;
+    return rad < 0 ? rad + TAU : rad;
+  }
+
+  // Which segment is under the pointer (pointer at top)
+  function getSegmentIndex(rotationRad){
+    const n = NAMES.length;
+    const slice = TAU / n;
+    const pointerAngle = -Math.PI / 2;
+    const a = normalize(pointerAngle - rotationRad);
+    const idx = Math.floor(a / slice);
+    return Math.min(Math.max(idx, 0), n - 1);
+  }
+
+  function drawWheel(rotationRad){
+    const W = canvas.width, H = canvas.height;
+    const cx = W/2, cy = H/2;
+    const radius = Math.min(W, H) * 0.45;
+
+    ctx.clearRect(0,0,W,H);
+
+    // Outer ring glow
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.beginPath();
+    ctx.arc(0, 0, radius + 22, 0, TAU);
+    ctx.fillStyle = "rgba(255,255,255,0.04)";
+    ctx.fill();
+    ctx.restore();
+
+    const n = NAMES.length;
+    const slice = TAU / n;
+
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(rotationRad);
+
+    for (let i = 0; i < n; i++){
+      const start = i * slice;
+      const end = start + slice;
+
+      // Segment fill (alternating)
+      const alt = i % 2 === 0;
+      ctx.beginPath();
+      ctx.moveTo(0,0);
+      ctx.arc(0,0,radius,start,end);
+      ctx.closePath();
+      ctx.fillStyle = alt ? "rgba(99,102,241,0.24)" : "rgba(20,184,166,0.18)";
+      ctx.fill();
+
+      // Segment border
+      ctx.strokeStyle = "rgba(148,163,184,0.18)";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Text
+      const mid = (start + end) / 2;
+      ctx.save();
+      ctx.rotate(mid);
+      ctx.textAlign = "right";
+      ctx.textBaseline = "middle";
+      ctx.fillStyle = "rgba(248,250,252,0.92)";
+      ctx.font = "800 28px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial";
+      ctx.fillText(NAMES[i], radius - 18, 0);
+      ctx.restore();
+    }
+
+    // Center cap
+    ctx.beginPath();
+    ctx.arc(0, 0, 72, 0, TAU);
+    ctx.fillStyle = "rgba(2,6,23,0.70)";
+    ctx.fill();
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = "rgba(148,163,184,0.25)";
+    ctx.stroke();
+
+    ctx.fillStyle = "rgba(248,250,252,0.92)";
+    ctx.font = "900 22px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText("WHO DA REELEST!", 0, -10);
+    ctx.font = "900 18px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial";
+    ctx.fillText("SPIN", 0, 18);
+
+    ctx.restore();
+  }
+
+  function easeOutCubic(t){
+    return 1 - Math.pow(1 - t, 3);
+  }
+
+  function spin(){
+    if (isSpinning) return;
+    isSpinning = true;
+    spinBtn.disabled = true;
+
+    resultValue.textContent = "Spinning…";
+    resultHint.textContent = "";
+
+    // Pick a target segment for the visual landing (but result display is fixed)
+    const targetIndex = Math.floor(Math.random() * NAMES.length);
+
+    const n = NAMES.length;
+    const slice = TAU / n;
+    const pointerAngle = -Math.PI / 2;
+
+    // Choose angle in the middle of the target segment
+    const targetMid = (targetIndex + 0.5) * slice;
+
+    // Solve for final rotation: pointerAngle - finalRotation ≡ targetMid (mod TAU)
+    let finalBase = pointerAngle - targetMid;
+
+    // Add extra spins for animation
+    const extraSpins = 6 + Math.floor(Math.random() * 4); // 6..9
+    const finalRotation = finalBase + extraSpins * TAU;
+
+    const start = performance.now();
+    const duration = 3600 + Math.random() * 800;
+    const startRotation = currentRotation;
+    const delta = finalRotation - startRotation;
+
+    const tick = (now) => {
+      const t = Math.min(1, (now - start) / duration);
+      const e = easeOutCubic(t);
+      currentRotation = startRotation + delta * e;
+
+      drawWheel(currentRotation);
+
+      if (t < 1){
+        rafId = requestAnimationFrame(tick);
+      } else {
+        isSpinning = false;
+        spinBtn.disabled = false;
+        rafId = null;
+
+        const landed = NAMES[getSegmentIndex(currentRotation)];
+        resultHint.textContent = `Wheel landed on: ${landed} (but the winner is fixed).`;
+        resultValue.textContent = FIXED_RESULT;
+      }
+    };
+
+    rafId = requestAnimationFrame(tick);
+  }
+
+  function reset(){
+    if (rafId) cancelAnimationFrame(rafId);
+    rafId = null;
+    isSpinning = false;
+    spinBtn.disabled = false;
+    currentRotation = 0;
+    drawWheel(currentRotation);
+    resultValue.textContent = "—";
+    resultHint.textContent = "";
+  }
+
+  // Init
+  drawWheel(currentRotation);
+  spinBtn.addEventListener("click", spin);
+  resetBtn.addEventListener("click", reset);
+  canvas.addEventListener("click", spin);
+})();
+</script>
+</body>
+</html>
