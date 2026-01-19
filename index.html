@@ -1,348 +1,401 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Who da reelest nigga!</title>
-  <style>
-    :root{
-      --bg:#020617;
-      --border:#1e293b;
-      --text:#e5e7eb;
-      --muted:#94a3b8;
-      --accent:#6366f1;
-      --shadow: rgba(0,0,0,.45);
-    }
-    *{ box-sizing:border-box; }
-    body{
-      margin:0;
-      min-height:100vh;
-      display:grid;
-      place-items:center;
-      background:
-        radial-gradient(900px 420px at 50% -12%, #0f172a, transparent),
-        radial-gradient(700px 360px at 10% 110%, #134e4a, transparent),
-        var(--bg);
-      color:var(--text);
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-    }
-    .frame{
-      width:min(560px, 92vw);
-      padding:18px;
-      border:1px solid var(--border);
-      border-radius:18px;
-      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
-      box-shadow: 0 18px 40px var(--shadow);
-      text-align:center;
-    }
-    .title{
-      font-weight:900;
-      font-size:22px;
-      margin:2px 0 8px;
-      letter-spacing:.2px;
-    }
-    .note{
-      margin:0 0 14px;
-      color:var(--muted);
-      font-size:14px;
-      line-height:1.45;
-    }
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>who da reelest!</title>
 
-    .stage{
-      position:relative;
-      display:grid;
-      place-items:center;
-      padding:10px 0 6px;
-    }
-    .wheelShell{
-      position:relative;
-      width:min(440px, 84vw);
-      aspect-ratio:1/1;
-      border-radius:50%;
-      filter: drop-shadow(0 18px 22px rgba(0,0,0,.45));
-      user-select:none;
-    }
-    canvas{
-      width:100%;
-      height:100%;
-      display:block;
-      border-radius:50%;
-      border: 10px solid rgba(255,255,255,.06);
-      background: rgba(255,255,255,.02);
-    }
-    .pointer{
-      position:absolute;
-      top:-7px;
-      left:50%;
-      transform:translateX(-50%);
-      width:0;height:0;
-      border-left:16px solid transparent;
-      border-right:16px solid transparent;
-      border-top:28px solid #f8fafc;
-      filter: drop-shadow(0 6px 10px rgba(0,0,0,.45));
-      z-index:5;
-    }
-    .pointer::after{
-      content:"";
-      position:absolute;
-      top:-34px;
-      left:-7px;
-      width:14px;
-      height:14px;
-      background:#f8fafc;
-      border-radius:50%;
-      box-shadow: 0 6px 12px rgba(0,0,0,.35);
-    }
+<style>
+:root{
+  --bg:#020617;
+  --border:#1e293b;
+  --text:#e5e7eb;
+  --muted:#94a3b8;
+  --accent:#6366f1;
+  --shadow: rgba(0,0,0,.45);
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  min-height:100vh;
+  display:grid;
+  place-items:center;
+  background:
+    radial-gradient(900px 420px at 50% -12%, #0f172a, transparent),
+    radial-gradient(700px 360px at 10% 110%, #134e4a, transparent),
+    var(--bg);
+  color:var(--text);
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+}
+.frame{
+  width:min(560px,92vw);
+  padding:18px;
+  border:1px solid var(--border);
+  border-radius:18px;
+  background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.02));
+  box-shadow:0 18px 40px var(--shadow);
+  text-align:center;
+}
+.title{
+  font-weight:900;
+  font-size:22px;
+  margin:0 0 12px;
+}
+.stage{
+  position:relative;
+  display:grid;
+  place-items:center;
+  padding:10px 0;
+}
+.wheelShell{
+  position:relative;
+  width:min(440px,84vw);
+  aspect-ratio:1/1;
+  border-radius:50%;
+  filter: drop-shadow(0 18px 22px rgba(0,0,0,.45));
+}
+canvas{
+  width:100%;
+  height:100%;
+  display:block;
+  border-radius:50%;
+  border:10px solid rgba(255,255,255,.06);
+  background: rgba(255,255,255,.02);
+}
+.pointer{
+  position:absolute;
+  top:-7px;
+  left:50%;
+  transform:translateX(-50%);
+  width:0;height:0;
+  border-left:16px solid transparent;
+  border-right:16px solid transparent;
+  border-top:28px solid #f8fafc;
+  filter: drop-shadow(0 6px 10px rgba(0,0,0,.45));
+}
+.controls{
+  display:flex;
+  justify-content:center;
+  gap:10px;
+  margin-top:10px;
+}
+button{
+  appearance:none;
+  border:none;
+  cursor:pointer;
+  border-radius:12px;
+  padding:12px 16px;
+  font-weight:900;
+  background:var(--accent);
+  color:#fff;
+  box-shadow: 0 10px 22px rgba(99,102,241,.28);
+}
+button.ghost{
+  background:transparent;
+  border:1px solid var(--border);
+  color:var(--text);
+  box-shadow:none;
+}
+button:disabled{
+  cursor:not-allowed;
+  opacity:.7;
+}
+.result{
+  margin-top:12px;
+  padding:10px;
+  border:1px solid var(--border);
+  border-radius:12px;
+  font-weight:900;
+  background: rgba(2,6,23,.35);
+}
 
-    .controls{
-      display:flex;
-      justify-content:center;
-      gap:10px;
-      flex-wrap:wrap;
-      margin:12px 0 0;
-    }
-    button{
-      appearance:none;
-      border:none;
-      cursor:pointer;
-      border-radius:12px;
-      padding:12px 14px;
-      font-weight:900;
-      background: var(--accent);
-      color:white;
-      box-shadow: 0 10px 22px rgba(99,102,241,.28);
-      transition: transform .08s ease, filter .15s ease;
-    }
-    button:active{ transform: translateY(1px) scale(.99); }
-    button:disabled{
-      cursor:not-allowed;
-      filter:saturate(.4) brightness(.85);
-      box-shadow:none;
-    }
-    .ghost{
-      background: transparent;
-      border: 1px solid var(--border);
-      color: var(--text);
-      box-shadow:none;
-    }
-    .result{
-      margin-top:12px;
-      padding:12px 12px;
-      border-radius:14px;
-      border:1px solid var(--border);
-      background: rgba(2,6,23,.35);
-      text-align:left;
-    }
-    .result .label{
-      font-size:12px;
-      color:var(--muted);
-      letter-spacing:.35px;
-      text-transform:uppercase;
-    }
-    .result .value{
-      margin-top:6px;
-      font-size:22px;
-      font-weight:950;
-    }
-  </style>
+/* pov text */
+.povText{
+  margin:18px 0 8px;
+  text-align:center;
+  font-weight:900;
+  font-size:16px;
+}
+
+/* stunt animation */
+.stuntWrap{
+  margin-top:10px;
+  border:1px solid var(--border);
+  border-radius:16px;
+  background:rgba(2,6,23,.35);
+  overflow:hidden;
+}
+.stuntScene{position:relative;height:220px}
+.building{
+  position:absolute;left:22px;top:24px;
+  width:110px;height:140px;
+  border:2px solid rgba(148,163,184,.35);
+  border-bottom:none;border-radius:10px 10px 0 0;
+  background: rgba(255,255,255,.03);
+}
+.ground{
+  position:absolute;left:0;right:0;bottom:20px;
+  height:2px;background:#fff;opacity:.5;
+}
+.stickman,.thrower{
+  position:absolute;width:46px;height:110px;
+}
+.head{
+  position:absolute;left:50%;top:0;
+  width:18px;height:18px;border:3px solid #fff;border-radius:50%;
+  transform:translateX(-50%);
+}
+.body{
+  position:absolute;left:50%;top:18px;
+  height:44px;border-left:3px solid #fff;
+  transform:translateX(-50%);
+}
+.arm,.leg{
+  position:absolute;left:50%;height:0;border-top:3px solid #fff;
+  transform-origin: 0 0;
+}
+.arm{top:30px;width:26px}
+.leg{top:60px;width:28px}
+
+.thrower{left:48px;top:38px;animation:throwMove 2.6s ease-in-out infinite}
+.stickman{left:92px;top:38px;transform-origin: 50% 92%;animation:thrownFall 2.6s ease-in-out infinite}
+
+@keyframes throwMove{
+  0%,10%,100%{transform:none}
+  18%{transform:translateX(8px) rotate(-6deg)}
+  24%{transform:translateX(8px) rotate(3deg)}
+  32%{transform:none}
+}
+@keyframes thrownFall{
+  0%{transform:none}
+  12%{transform:none}
+  20%{transform:translate(26px,-8px) rotate(-15deg)}
+  40%{transform:translate(160px,70px) rotate(75deg)}
+  62%{transform:translate(305px,130px) rotate(140deg)}
+  76%{transform:translate(342px,146px) rotate(92deg) scale(1.02)}
+  86%{transform:translate(350px,146px) rotate(96deg)}
+  100%{transform:translate(350px,146px) rotate(96deg)}
+}
+
+/* popup modal */
+.modal{
+  position:fixed;
+  inset:0;
+  display:none;
+  place-items:center;
+  background: rgba(0,0,0,.72);
+  padding:18px;
+  z-index:9999;
+}
+.modal[aria-hidden="false"]{ display:grid; }
+.modalCard{
+  width:min(520px, 94vw);
+  border:1px solid var(--border);
+  border-radius:16px;
+  background: rgba(2,6,23,.92);
+  box-shadow: 0 24px 60px rgba(0,0,0,.6);
+  overflow:hidden;
+  text-align:left;
+}
+.modalHead{
+  padding:14px 14px 10px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+.modalTitle{
+  font-weight:950;
+  font-size:18px;
+}
+.closeBtn{
+  background: transparent;
+  border:1px solid rgba(148,163,184,.25);
+  color: var(--text);
+  padding:8px 10px;
+  border-radius:10px;
+  box-shadow:none;
+}
+.modalBody{
+  padding:0 14px 14px;
+}
+.modalBody img{
+  width:100%;
+  height:auto;
+  border-radius:12px;
+  border:1px solid rgba(148,163,184,.18);
+}
+.modalFoot{
+  padding:0 14px 14px;
+  color: var(--muted);
+  font-size:12px;
+}
+.modalFoot a{ color: var(--muted); }
+</style>
 </head>
+
 <body>
-  <div class="frame">
-    <div class="title">Who da reelest nigga!</div>
-    <p class="note">Real talk; we need to know who the reelest nigga is fr fr 💯</p>
-    <p class="note">whoever this shit lands on is the the winner fr fr you get me shiiiiiet 🙋🏿‍♂️</p>
-    <div class="stage">
-      <div class="wheelShell" aria-label="Roulette wheel">
-        <div class="pointer" aria-hidden="true"></div>
-        <canvas id="wheel" width="900" height="900"></canvas>
-      </div>
-    </div>
-    <p class="note">ayyo i dont gotta see ma kids no mo 🥛🕺🏿</p>
+<div class="frame">
+  <div class="title">who da reelest!</div>
 
-    <div class="controls">
-      <button id="spinBtn">Spin</button>
-      <button id="resetBtn" class="ghost">Reset</button>
-    </div>
-
-    <div class="result" role="status" aria-live="polite">
-      <div class="label">Winner</div>
-      <div class="value" id="resultValue">—</div>
+  <div class="stage">
+    <div class="wheelShell">
+      <div class="pointer"></div>
+      <canvas id="wheel" width="900" height="900"></canvas>
     </div>
   </div>
 
+  <div class="controls">
+    <button id="spinBtn">spin</button>
+    <button id="resetBtn" class="ghost">reset</button>
+  </div>
+
+  <div class="result" id="resultValue">—</div>
+
+  <div class="povText">pov you said guy morgan wasnt the reelest</div>
+
+  <div class="stuntWrap">
+    <div class="stuntScene">
+      <div class="building"></div>
+
+      <div class="thrower" aria-hidden="true">
+        <div class="head"></div><div class="body"></div>
+        <div class="arm"></div><div class="arm"></div>
+        <div class="leg"></div><div class="leg"></div>
+      </div>
+
+      <div class="stickman" aria-hidden="true">
+        <div class="head"></div><div class="body"></div>
+        <div class="arm"></div><div class="arm"></div>
+        <div class="leg"></div><div class="leg"></div>
+      </div>
+
+      <div class="ground"></div>
+    </div>
+  </div>
+</div>
+
+<!-- popup -->
+<div class="modal" id="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-label="popup">
+  <div class="modalCard">
+    <div class="modalHead">
+      <div class="modalTitle">yoooooooo he got a point!</div>
+      <button class="closeBtn" id="closeModalBtn" type="button">close</button>
+    </div>
+    <div class="modalBody">
+      <a href="https://imgflip.com/i/ahsl8w">
+        <img src="https://i.imgflip.com/ahsl8w.jpg" alt="meme image" title="made at imgflip.com"/>
+      </a>
+    </div>
+    <div class="modalFoot">
+      <a href="https://imgflip.com/memegenerator">from Imgflip Meme Generator</a>
+    </div>
+  </div>
+</div>
+
 <script>
-(() => {
-  // Segment labels (includes Guy Morgan on the wheel)
-  const NAMES = [
-    "Guy Morgan",
-    "Idris Elba",
-    "Will Smith",
-    "Michael B. Jordan",
-    "Donald Glover",
-    "Dev Patel",
-    "Riz Ahmed",
-    "Simu Liu",
-    "Steven Yeun",
-    "John Boyega",
-    "Dwayne Johnson",
-    "Bad Bunny",
-    "The Weeknd",
-    "Drake",
-    "J Balvin",
-    "Jason Momoa"
-  ];
+const NAMES=[
+  "Guy Morgan","Idris Elba","Will Smith","Michael B. Jordan",
+  "Donald Glover","Dev Patel","Riz Ahmed","Simu Liu",
+  "John Boyega","Bad Bunny","The Weeknd","Drake"
+];
+const FIXED="Guy Morgan";
+const FIXED_INDEX=NAMES.indexOf(FIXED);
 
-  const FIXED_NAME = "Guy Morgan";
-  const FIXED_INDEX = NAMES.indexOf(FIXED_NAME); // always land here
+const canvas=document.getElementById("wheel");
+const ctx=canvas.getContext("2d");
+const spinBtn=document.getElementById("spinBtn");
+const resetBtn=document.getElementById("resetBtn");
+const result=document.getElementById("resultValue");
 
-  const canvas = document.getElementById("wheel");
-  const ctx = canvas.getContext("2d");
-  const spinBtn = document.getElementById("spinBtn");
-  const resetBtn = document.getElementById("resetBtn");
-  const resultValue = document.getElementById("resultValue");
+const modal=document.getElementById("modal");
+const closeModalBtn=document.getElementById("closeModalBtn");
 
-  let currentRotation = 0; // radians
-  let isSpinning = false;
-  let rafId = null;
+let rot=0,spinning=false;
+const TAU=Math.PI*2;
 
-  const TAU = Math.PI * 2;
+function draw(){
+  const r=canvas.width/2;
+  ctx.clearRect(0,0,canvas.width,canvas.height);
 
-  function drawWheel(rotationRad){
-    const W = canvas.width, H = canvas.height;
-    const cx = W/2, cy = H/2;
-    const radius = Math.min(W, H) * 0.45;
+  ctx.save();
+  ctx.translate(r,r);
+  ctx.rotate(rot);
 
-    ctx.clearRect(0,0,W,H);
+  const slice=TAU/NAMES.length;
 
-    // Outer ring
-    ctx.save();
-    ctx.translate(cx, cy);
+  for(let i=0;i<NAMES.length;i++){
     ctx.beginPath();
-    ctx.arc(0, 0, radius + 22, 0, TAU);
-    ctx.fillStyle = "rgba(255,255,255,0.04)";
+    ctx.moveTo(0,0);
+    ctx.arc(0,0,r*0.85,i*slice,(i+1)*slice);
+    ctx.closePath();
+    ctx.fillStyle=i%2?"rgba(20,184,166,.2)":"rgba(99,102,241,.25)";
     ctx.fill();
-    ctx.restore();
-
-    const n = NAMES.length;
-    const slice = TAU / n;
 
     ctx.save();
-    ctx.translate(cx, cy);
-    ctx.rotate(rotationRad);
+    ctx.rotate((i+.5)*slice);
+    ctx.textAlign="right";
+    ctx.textBaseline="middle";
+    ctx.fillStyle="rgba(255,255,255,.95)";
+    ctx.font="700 28px system-ui";
+    ctx.fillText(NAMES[i],r*0.8,0);
+    ctx.restore();
+  }
 
-    for (let i = 0; i < n; i++){
-      const start = i * slice;
-      const end = start + slice;
+  ctx.restore();
+}
+draw();
 
-      // Segment fill (alternating)
-      const alt = i % 2 === 0;
-      ctx.beginPath();
-      ctx.moveTo(0,0);
-      ctx.arc(0,0,radius,start,end);
-      ctx.closePath();
-      ctx.fillStyle = alt ? "rgba(99,102,241,0.24)" : "rgba(20,184,166,0.18)";
-      ctx.fill();
+function openModal(){
+  modal.setAttribute("aria-hidden","false");
+}
+function closeModal(){
+  modal.setAttribute("aria-hidden","true");
+}
+closeModalBtn.addEventListener("click", closeModal);
+modal.addEventListener("click", (e)=>{ if(e.target===modal) closeModal(); });
+document.addEventListener("keydown", (e)=>{ if(e.key==="Escape") closeModal(); });
 
-      // Segment border
-      ctx.strokeStyle = "rgba(148,163,184,0.18)";
-      ctx.lineWidth = 2;
-      ctx.stroke();
+spinBtn.onclick=()=>{
+  if(spinning)return;
+  spinning=true;
+  spinBtn.disabled=true;
+  result.textContent="spinnin…";
 
-      // Text
-      const mid = (start + end) / 2;
-      ctx.save();
-      ctx.rotate(mid);
-      ctx.textAlign = "right";
-      ctx.textBaseline = "middle";
-      ctx.fillStyle = "rgba(248,250,252,0.92)";
-      ctx.font = "900 28px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial";
-      ctx.fillText(NAMES[i], radius - 18, 0);
-      ctx.restore();
+  const slice=TAU/NAMES.length;
+  const targetMid=(FIXED_INDEX+.5)*slice;
+
+  // land on Guy Morgan (centered under pointer)
+  const final=(-Math.PI/2 - targetMid) + (7*TAU);
+
+  const start=performance.now();
+  const dur=3000;
+  const from=rot;
+
+  const tick=t=>{
+    const p=Math.min(1,(t-start)/dur);
+    const eased = 1 - Math.pow(1-p,3);
+    rot=from+(final-from)*eased;
+    draw();
+
+    if(p<1){
+      requestAnimationFrame(tick);
+    } else {
+      spinning=false;
+      spinBtn.disabled=false;
+      result.textContent=FIXED;
+      openModal();
     }
+  };
+  requestAnimationFrame(tick);
+};
 
-    // Center cap
-    ctx.beginPath();
-    ctx.arc(0, 0, 78, 0, TAU);
-    ctx.fillStyle = "rgba(2,6,23,0.72)";
-    ctx.fill();
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = "rgba(148,163,184,0.25)";
-    ctx.stroke();
-
-    ctx.fillStyle = "rgba(248,250,252,0.92)";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.font = "950 22px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial";
-    ctx.fillText("WHO DA REELEST!", 0, -10);
-    ctx.font = "950 18px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial";
-    ctx.fillText("SPIN", 0, 18);
-
-    ctx.restore();
-  }
-
-  function easeOutCubic(t){
-    return 1 - Math.pow(1 - t, 3);
-  }
-
-  function spin(){
-    if (isSpinning) return;
-    isSpinning = true;
-    spinBtn.disabled = true;
-    resultValue.textContent = "Spinnin’…";
-
-    const n = NAMES.length;
-    const slice = TAU / n;
-    const pointerAngle = -Math.PI / 2;
-
-    // Land on Guy Morgan slice (centered)
-    const targetMid = (FIXED_INDEX + 0.5) * slice;
-    // pointerAngle - finalRotation ≡ targetMid (mod TAU)
-    const finalBase = pointerAngle - targetMid;
-
-    // Add extra spins for animation
-    const extraSpins = 7 + Math.floor(Math.random() * 3); // 7..9
-    const finalRotation = finalBase + extraSpins * TAU;
-
-    const start = performance.now();
-    const duration = 3600 + Math.random() * 800;
-    const startRotation = currentRotation;
-    const delta = finalRotation - startRotation;
-
-    const tick = (now) => {
-      const t = Math.min(1, (now - start) / duration);
-      const e = easeOutCubic(t);
-      currentRotation = startRotation + delta * e;
-
-      drawWheel(currentRotation);
-
-      if (t < 1){
-        rafId = requestAnimationFrame(tick);
-      } else {
-        isSpinning = false;
-        spinBtn.disabled = false;
-        rafId = null;
-        resultValue.textContent = FIXED_NAME;
-      }
-    };
-
-    rafId = requestAnimationFrame(tick);
-  }
-
-  function reset(){
-    if (rafId) cancelAnimationFrame(rafId);
-    rafId = null;
-    isSpinning = false;
-    spinBtn.disabled = false;
-    currentRotation = 0;
-    drawWheel(currentRotation);
-    resultValue.textContent = "—";
-  }
-
-  drawWheel(currentRotation);
-  spinBtn.addEventListener("click", spin);
-  resetBtn.addEventListener("click", reset);
-  canvas.addEventListener("click", spin);
-})();
+resetBtn.onclick=()=>{
+  rot=0;
+  draw();
+  result.textContent="—";
+  closeModal();
+};
 </script>
 </body>
 </html>
