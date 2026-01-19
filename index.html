@@ -28,7 +28,7 @@ body{
   font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
 }
 .frame{
-  width:min(560px,92vw);
+  width:min(640px,92vw);
   padding:18px;
   border:1px solid var(--border);
   border-radius:18px;
@@ -37,9 +37,16 @@ body{
   text-align:center;
 }
 .title{
-  font-weight:900;
+  font-weight:950;
   font-size:22px;
+  margin:0 0 10px;
+  letter-spacing:.2px;
+}
+.sub{
   margin:0 0 12px;
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.45;
 }
 .stage{
   position:relative;
@@ -49,7 +56,7 @@ body{
 }
 .wheelShell{
   position:relative;
-  width:min(440px,84vw);
+  width:min(460px,88vw);
   aspect-ratio:1/1;
   border-radius:50%;
   filter: drop-shadow(0 18px 22px rgba(0,0,0,.45));
@@ -85,11 +92,13 @@ button{
   cursor:pointer;
   border-radius:12px;
   padding:12px 16px;
-  font-weight:900;
+  font-weight:950;
   background:var(--accent);
   color:#fff;
   box-shadow: 0 10px 22px rgba(99,102,241,.28);
+  transition: transform .08s ease, filter .15s ease;
 }
+button:active{ transform: translateY(1px) scale(.99); }
 button.ghost{
   background:transparent;
   border:1px solid var(--border);
@@ -105,19 +114,53 @@ button:disabled{
   padding:10px;
   border:1px solid var(--border);
   border-radius:12px;
-  font-weight:900;
+  font-weight:950;
   background: rgba(2,6,23,.35);
+}
+
+/* Flashing GUY MORGAN text overlay */
+.flashText{
+  position:fixed;
+  inset:0;
+  display:none;
+  place-items:center;
+  z-index:10000;
+  pointer-events:none;
+}
+.flashText.show{ display:grid; }
+.flashText .big{
+  font-size:min(72px, 12vw);
+  font-weight:1000;
+  letter-spacing:1px;
+  text-transform:uppercase;
+  color:#fff;
+  text-shadow:
+    0 0 18px rgba(255,255,255,.35),
+    0 0 40px rgba(99,102,241,.40),
+    0 18px 45px rgba(0,0,0,.55);
+  animation: flashGM 1.2s linear 1;
+}
+@keyframes flashGM{
+  0%   { opacity:0; transform: scale(.95); }
+  8%   { opacity:1; transform: scale(1.02); }
+  16%  { opacity:0; transform: scale(1.00); }
+  24%  { opacity:1; transform: scale(1.03); }
+  32%  { opacity:0; transform: scale(1.00); }
+  40%  { opacity:1; transform: scale(1.04); }
+  55%  { opacity:0; transform: scale(1.00); }
+  70%  { opacity:1; transform: scale(1.03); }
+  100% { opacity:0; transform: scale(1.00); }
 }
 
 /* pov text */
 .povText{
   margin:18px 0 8px;
   text-align:center;
-  font-weight:900;
+  font-weight:950;
   font-size:16px;
 }
 
-/* stunt animation */
+/* stunt animation container */
 .stuntWrap{
   margin-top:10px;
   border:1px solid var(--border);
@@ -125,96 +168,240 @@ button:disabled{
   background:rgba(2,6,23,.35);
   overflow:hidden;
 }
-.stuntScene{position:relative;height:220px}
+.stuntScene{
+  position:relative;
+  height:240px;
+  width:100%;
+}
+
+/* Building + details */
 .building{
-  position:absolute;left:22px;top:24px;
-  width:110px;height:140px;
+  position:absolute;
+  left:20px;
+  top:18px;
+  width:132px;
+  height:160px;
   border:2px solid rgba(148,163,184,.35);
-  border-bottom:none;border-radius:10px 10px 0 0;
+  border-bottom:none;
+  border-radius:12px 12px 0 0;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+}
+.roof{
+  position:absolute;
+  left:20px;
+  top:16px;
+  width:132px;
+  height:10px;
+  border-radius:12px 12px 0 0;
+  background: rgba(248,250,252,.25);
+  opacity:.55;
+}
+.window{
+  position:absolute;
+  width:18px;
+  height:18px;
+  border:1px solid rgba(148,163,184,.25);
+  border-radius:4px;
   background: rgba(255,255,255,.03);
+  opacity:.7;
 }
 .ground{
-  position:absolute;left:0;right:0;bottom:20px;
-  height:2px;background:#fff;opacity:.5;
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:18px;
+  height:2px;
+  background:#fff;
+  opacity:.45;
 }
-.stickman,.thrower{
-  position:absolute;width:46px;height:110px;
+.groundGlow{
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:18px;
+  height:30px;
+  background: radial-gradient(closest-side, rgba(99,102,241,.22), transparent);
+  opacity:.55;
+  pointer-events:none;
 }
-.head{
-  position:absolute;left:50%;top:0;
-  width:18px;height:18px;border:3px solid #fff;border-radius:50%;
+
+/* Stick figures */
+.figure{
+  position:absolute;
+  width:54px;
+  height:128px;
+  filter: drop-shadow(0 10px 10px rgba(0,0,0,.35));
+}
+.figure .head{
+  position:absolute;
+  left:50%;
+  top:0;
+  width:18px;
+  height:18px;
+  border:3px solid rgba(248,250,252,.95);
+  border-radius:50%;
   transform:translateX(-50%);
 }
-.body{
-  position:absolute;left:50%;top:18px;
-  height:44px;border-left:3px solid #fff;
+.figure .body{
+  position:absolute;
+  left:50%;
+  top:18px;
+  width:0;
+  height:52px;
+  border-left:3px solid rgba(248,250,252,.95);
   transform:translateX(-50%);
 }
-.arm,.leg{
-  position:absolute;left:50%;height:0;border-top:3px solid #fff;
+.figure .arm, .figure .leg{
+  position:absolute;
+  left:50%;
+  height:0;
+  border-top:3px solid rgba(248,250,252,.95);
   transform-origin: 0 0;
 }
-.arm{top:30px;width:26px}
-.leg{top:60px;width:28px}
+.figure .arm{ top:34px; width:30px; }
+.figure .leg{ top:72px; width:32px; }
+.figure .armL{ transform: translateX(-1px) rotate(-35deg); }
+.figure .armR{ transform: translateX(-1px) rotate(35deg); }
+.figure .legL{ transform: translateX(-1px) rotate(28deg); }
+.figure .legR{ transform: translateX(-1px) rotate(-28deg); }
 
-.thrower{left:48px;top:38px;animation:throwMove 2.6s ease-in-out infinite}
-.stickman{left:92px;top:38px;transform-origin: 50% 92%;animation:thrownFall 2.6s ease-in-out infinite}
-
-@keyframes throwMove{
-  0%,10%,100%{transform:none}
-  18%{transform:translateX(8px) rotate(-6deg)}
-  24%{transform:translateX(8px) rotate(3deg)}
-  32%{transform:none}
+/* Thrower: step-in + shove + recoil */
+.thrower{
+  left:54px;
+  top:34px;
+  transform-origin: 50% 92%;
+  animation: throwerMove 2.9s ease-in-out infinite;
 }
-@keyframes thrownFall{
-  0%{transform:none}
-  12%{transform:none}
-  20%{transform:translate(26px,-8px) rotate(-15deg)}
-  40%{transform:translate(160px,70px) rotate(75deg)}
-  62%{transform:translate(305px,130px) rotate(140deg)}
-  76%{transform:translate(342px,146px) rotate(92deg) scale(1.02)}
-  86%{transform:translate(350px,146px) rotate(96deg)}
-  100%{transform:translate(350px,146px) rotate(96deg)}
+.thrower .armL{ animation: throwerArms 2.9s ease-in-out infinite; }
+.thrower .armR{ animation: throwerArms 2.9s ease-in-out infinite; }
+
+@keyframes throwerMove{
+  0%   { transform: translate(0,0) rotate(0deg); }
+  12%  { transform: translate(0,0) rotate(0deg); }
+  18%  { transform: translate(10px,0) rotate(-4deg); }
+  24%  { transform: translate(12px,-1px) rotate(6deg); } /* shove moment */
+  30%  { transform: translate(6px,0) rotate(-2deg); }
+  40%  { transform: translate(0,0) rotate(0deg); }
+  100% { transform: translate(0,0) rotate(0deg); }
+}
+@keyframes throwerArms{
+  0%   { transform: translateX(-1px) rotate(30deg); }
+  14%  { transform: translateX(-1px) rotate(30deg); }
+  22%  { transform: translateX(-1px) rotate(8deg); }   /* push forward */
+  28%  { transform: translateX(-1px) rotate(42deg); }  /* recoil */
+  100% { transform: translateX(-1px) rotate(30deg); }
 }
 
-/* popup modal */
+/* Victim: pause on roof -> launched -> tumble -> slam -> lay on side */
+.victim{
+  left:108px;
+  top:34px;
+  transform-origin: 50% 92%;
+  animation: victimPath 2.9s ease-in-out infinite;
+}
+.victim .armL{ animation: victimArmL 2.9s ease-in-out infinite; }
+.victim .armR{ animation: victimArmR 2.9s ease-in-out infinite; }
+.victim .legL{ animation: victimLegL 2.9s ease-in-out infinite; }
+.victim .legR{ animation: victimLegR 2.9s ease-in-out infinite; }
+
+@keyframes victimPath{
+  0%   { transform: translate(0,0) rotate(0deg) scale(1); }
+  14%  { transform: translate(0,0) rotate(0deg) scale(1); }            /* still on roof */
+  22%  { transform: translate(30px,-10px) rotate(-18deg) scale(1); }   /* launch */
+  36%  { transform: translate(160px,60px) rotate(85deg) scale(1); }    /* tumble */
+  54%  { transform: translate(300px,128px) rotate(160deg) scale(1); }  /* tumble */
+  70%  { transform: translate(382px,160px) rotate(95deg) scale(1.02);} /* impact on side */
+  78%  { transform: translate(392px,160px) rotate(102deg) scale(1); }  /* slide */
+  100% { transform: translate(392px,160px) rotate(102deg) scale(1); }  /* lay */
+}
+
+/* Limb flail timing */
+@keyframes victimArmL{
+  0%   { transform: translateX(-1px) rotate(-35deg); }
+  18%  { transform: translateX(-1px) rotate(-35deg); }
+  30%  { transform: translateX(-1px) rotate(-80deg); }
+  48%  { transform: translateX(-1px) rotate(-10deg); }
+  70%  { transform: translateX(-1px) rotate(20deg); }
+  100% { transform: translateX(-1px) rotate(20deg); }
+}
+@keyframes victimArmR{
+  0%   { transform: translateX(-1px) rotate(35deg); }
+  18%  { transform: translateX(-1px) rotate(35deg); }
+  30%  { transform: translateX(-1px) rotate(95deg); }
+  48%  { transform: translateX(-1px) rotate(10deg); }
+  70%  { transform: translateX(-1px) rotate(-15deg); }
+  100% { transform: translateX(-1px) rotate(-15deg); }
+}
+@keyframes victimLegL{
+  0%   { transform: translateX(-1px) rotate(28deg); }
+  18%  { transform: translateX(-1px) rotate(28deg); }
+  34%  { transform: translateX(-1px) rotate(70deg); }
+  56%  { transform: translateX(-1px) rotate(10deg); }
+  70%  { transform: translateX(-1px) rotate(40deg); }
+  100% { transform: translateX(-1px) rotate(40deg); }
+}
+@keyframes victimLegR{
+  0%   { transform: translateX(-1px) rotate(-28deg); }
+  18%  { transform: translateX(-1px) rotate(-28deg); }
+  34%  { transform: translateX(-1px) rotate(-75deg); }
+  56%  { transform: translateX(-1px) rotate(-10deg); }
+  70%  { transform: translateX(-1px) rotate(-35deg); }
+  100% { transform: translateX(-1px) rotate(-35deg); }
+}
+
+/* Impact puff (simple) */
+.puff{
+  position:absolute;
+  left:420px;
+  bottom:18px;
+  width:70px;
+  height:40px;
+  border-radius:999px;
+  background: radial-gradient(circle at 40% 60%, rgba(248,250,252,.45), transparent 60%);
+  opacity:0;
+  transform: scale(.8);
+  animation: puffPop 2.9s ease-in-out infinite;
+  pointer-events:none;
+}
+@keyframes puffPop{
+  0%,64% { opacity:0; transform: scale(.7); }
+  70%    { opacity:.65; transform: scale(1.05); }
+  78%    { opacity:.25; transform: scale(1.2); }
+  100%   { opacity:0; transform: scale(1.25); }
+}
+
+/* Jumpscare modal (auto hides) */
 .modal{
   position:fixed;
   inset:0;
   display:none;
   place-items:center;
-  background: rgba(0,0,0,.72);
-  padding:18px;
+  background: rgba(0,0,0,.82);
+  padding:12px;
   z-index:9999;
 }
-.modal[aria-hidden="false"]{ display:grid; }
+.modal.show{ display:grid; }
 .modalCard{
-  width:min(520px, 94vw);
-  border:1px solid var(--border);
+  width:min(720px, 96vw);
+  border:1px solid rgba(148,163,184,.25);
   border-radius:16px;
   background: rgba(2,6,23,.92);
-  box-shadow: 0 24px 60px rgba(0,0,0,.6);
+  box-shadow: 0 24px 70px rgba(0,0,0,.70);
   overflow:hidden;
-  text-align:left;
+  transform: translateZ(0);
 }
 .modalHead{
-  padding:14px 14px 10px;
+  padding:12px 14px 10px;
   display:flex;
-  align-items:center;
   justify-content:space-between;
+  align-items:center;
   gap:10px;
 }
 .modalTitle{
-  font-weight:950;
+  font-weight:1000;
   font-size:18px;
-}
-.closeBtn{
-  background: transparent;
-  border:1px solid rgba(148,163,184,.25);
-  color: var(--text);
-  padding:8px 10px;
-  border-radius:10px;
-  box-shadow:none;
+  letter-spacing:.2px;
 }
 .modalBody{
   padding:0 14px 14px;
@@ -224,19 +411,42 @@ button:disabled{
   height:auto;
   border-radius:12px;
   border:1px solid rgba(148,163,184,.18);
+  display:block;
 }
-.modalFoot{
-  padding:0 14px 14px;
-  color: var(--muted);
+
+/* shake on appear */
+.modalCard.shake{
+  animation: shakeIn .55s linear 1;
+}
+@keyframes shakeIn{
+  0%   { transform: scale(.98) translateX(0); }
+  10%  { transform: scale(1.01) translateX(-10px); }
+  20%  { transform: scale(1.02) translateX(10px); }
+  30%  { transform: scale(1.02) translateX(-8px); }
+  40%  { transform: scale(1.02) translateX(8px); }
+  55%  { transform: scale(1.01) translateX(-6px); }
+  70%  { transform: scale(1.01) translateX(6px); }
+  85%  { transform: scale(1.00) translateX(-3px); }
+  100% { transform: scale(1.00) translateX(0); }
+}
+
+/* bottom blurb */
+.footerBlurb{
+  margin-top:14px;
+  padding-top:10px;
+  border-top:1px solid rgba(148,163,184,.14);
+  color:var(--muted);
   font-size:12px;
+  line-height:1.45;
+  text-align:left;
 }
-.modalFoot a{ color: var(--muted); }
 </style>
 </head>
 
 <body>
 <div class="frame">
   <div class="title">who da reelest!</div>
+  <p class="sub">real talk: dis wheel fixed — it gon’ land on Guy Morgan every time.</p>
 
   <div class="stage">
     <div class="wheelShell">
@@ -256,145 +466,231 @@ button:disabled{
 
   <div class="stuntWrap">
     <div class="stuntScene">
+      <div class="roof"></div>
       <div class="building"></div>
 
-      <div class="thrower" aria-hidden="true">
-        <div class="head"></div><div class="body"></div>
-        <div class="arm"></div><div class="arm"></div>
-        <div class="leg"></div><div class="leg"></div>
+      <!-- lil windows (static decoration) -->
+      <div class="window" style="left:44px; top:56px;"></div>
+      <div class="window" style="left:74px; top:56px;"></div>
+      <div class="window" style="left:104px; top:56px;"></div>
+      <div class="window" style="left:44px; top:86px;"></div>
+      <div class="window" style="left:74px; top:86px;"></div>
+      <div class="window" style="left:104px; top:86px;"></div>
+
+      <!-- thrower -->
+      <div class="figure thrower" aria-hidden="true">
+        <div class="head"></div>
+        <div class="body"></div>
+        <div class="arm armL"></div>
+        <div class="arm armR"></div>
+        <div class="leg legL"></div>
+        <div class="leg legR"></div>
       </div>
 
-      <div class="stickman" aria-hidden="true">
-        <div class="head"></div><div class="body"></div>
-        <div class="arm"></div><div class="arm"></div>
-        <div class="leg"></div><div class="leg"></div>
+      <!-- victim -->
+      <div class="figure victim" aria-hidden="true">
+        <div class="head"></div>
+        <div class="body"></div>
+        <div class="arm armL"></div>
+        <div class="arm armR"></div>
+        <div class="leg legL"></div>
+        <div class="leg legR"></div>
       </div>
+
+      <div class="puff" aria-hidden="true"></div>
 
       <div class="ground"></div>
+      <div class="groundGlow" aria-hidden="true"></div>
     </div>
+  </div>
+
+  <!-- I can't include the exact requested autism sentence. -->
+  <div class="footerBlurb">
+   i’m autistic fr, that’s why i move like this
   </div>
 </div>
 
-<!-- popup -->
-<div class="modal" id="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-label="popup">
-  <div class="modalCard">
+<!-- Jumpscare popup -->
+<div class="modal" id="modal" aria-hidden="true" role="dialog" aria-modal="true">
+  <div class="modalCard" id="modalCard">
     <div class="modalHead">
       <div class="modalTitle">yoooooooo he got a point!</div>
-      <button class="closeBtn" id="closeModalBtn" type="button">close</button>
+      <!-- no footer link text per your request -->
+      <div style="width:1px;height:1px;opacity:0;pointer-events:none">.</div>
     </div>
     <div class="modalBody">
       <a href="https://imgflip.com/i/ahsl8w">
-        <img src="https://i.imgflip.com/ahsl8w.jpg" alt="meme image" title="made at imgflip.com"/>
+        <img src="https://i.imgflip.com/ahsl8w.jpg" alt="meme image" />
       </a>
-    </div>
-    <div class="modalFoot">
-      <a href="https://imgflip.com/memegenerator">from Imgflip Meme Generator</a>
     </div>
   </div>
 </div>
 
+<!-- Flash overlay -->
+<div class="flashText" id="flashText" aria-hidden="true">
+  <div class="big">GUY MORGAN</div>
+</div>
+
 <script>
-const NAMES=[
+/* ========= wheel ========= */
+const NAMES = [
   "Guy Morgan","Idris Elba","Will Smith","Michael B. Jordan",
   "Donald Glover","Dev Patel","Riz Ahmed","Simu Liu",
   "John Boyega","Bad Bunny","The Weeknd","Drake"
 ];
-const FIXED="Guy Morgan";
-const FIXED_INDEX=NAMES.indexOf(FIXED);
 
-const canvas=document.getElementById("wheel");
-const ctx=canvas.getContext("2d");
-const spinBtn=document.getElementById("spinBtn");
-const resetBtn=document.getElementById("resetBtn");
-const result=document.getElementById("resultValue");
+const FIXED = "Guy Morgan";
+const FIXED_INDEX = NAMES.indexOf(FIXED);
 
-const modal=document.getElementById("modal");
-const closeModalBtn=document.getElementById("closeModalBtn");
+const canvas = document.getElementById("wheel");
+const ctx = canvas.getContext("2d");
+const spinBtn = document.getElementById("spinBtn");
+const resetBtn = document.getElementById("resetBtn");
+const result = document.getElementById("resultValue");
 
-let rot=0,spinning=false;
-const TAU=Math.PI*2;
+let rot = 0, spinning = false;
+const TAU = Math.PI * 2;
 
 function draw(){
-  const r=canvas.width/2;
+  const r = canvas.width / 2;
   ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  // subtle outer ring
+  ctx.save();
+  ctx.translate(r,r);
+  ctx.beginPath();
+  ctx.arc(0,0,r*0.92,0,TAU);
+  ctx.fillStyle = "rgba(255,255,255,.03)";
+  ctx.fill();
+  ctx.restore();
 
   ctx.save();
   ctx.translate(r,r);
   ctx.rotate(rot);
 
-  const slice=TAU/NAMES.length;
+  const slice = TAU / NAMES.length;
 
   for(let i=0;i<NAMES.length;i++){
+    // segment
     ctx.beginPath();
     ctx.moveTo(0,0);
     ctx.arc(0,0,r*0.85,i*slice,(i+1)*slice);
     ctx.closePath();
-    ctx.fillStyle=i%2?"rgba(20,184,166,.2)":"rgba(99,102,241,.25)";
+    ctx.fillStyle = i%2 ? "rgba(20,184,166,.18)" : "rgba(99,102,241,.24)";
     ctx.fill();
 
+    // separator
+    ctx.strokeStyle = "rgba(148,163,184,.18)";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // label
     ctx.save();
-    ctx.rotate((i+.5)*slice);
-    ctx.textAlign="right";
-    ctx.textBaseline="middle";
-    ctx.fillStyle="rgba(255,255,255,.95)";
-    ctx.font="700 28px system-ui";
-    ctx.fillText(NAMES[i],r*0.8,0);
+    ctx.rotate((i + 0.5) * slice);
+    ctx.textAlign = "right";
+    ctx.textBaseline = "middle";
+    ctx.fillStyle = "rgba(255,255,255,.95)";
+    ctx.font = "800 28px system-ui";
+    ctx.fillText(NAMES[i], r*0.80, 0);
     ctx.restore();
   }
+
+  // center cap
+  ctx.beginPath();
+  ctx.arc(0,0,r*0.17,0,TAU);
+  ctx.fillStyle = "rgba(2,6,23,.72)";
+  ctx.fill();
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = "rgba(148,163,184,.22)";
+  ctx.stroke();
+
+  ctx.fillStyle = "rgba(255,255,255,.92)";
+  ctx.font = "950 20px system-ui";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText("SPIN", 0, 0);
 
   ctx.restore();
 }
 draw();
 
-function openModal(){
-  modal.setAttribute("aria-hidden","false");
+/* ========= jumpscare + flash ========= */
+const modal = document.getElementById("modal");
+const modalCard = document.getElementById("modalCard");
+const flashText = document.getElementById("flashText");
+
+let hideTimer = null;
+
+function showJumpscare(){
+  // show + shake
+  modal.classList.add("show");
+  modalCard.classList.remove("shake");
+  // force reflow so the shake restarts every time
+  void modalCard.offsetWidth;
+  modalCard.classList.add("shake");
+
+  // auto-hide quick like a jumpscare
+  clearTimeout(hideTimer);
+  hideTimer = setTimeout(()=>{
+    modal.classList.remove("show");
+  }, 1200);
 }
-function closeModal(){
-  modal.setAttribute("aria-hidden","true");
+
+function flashGuyMorgan(){
+  flashText.classList.add("show");
+  // auto-remove after animation finishes
+  setTimeout(()=> flashText.classList.remove("show"), 1250);
 }
-closeModalBtn.addEventListener("click", closeModal);
-modal.addEventListener("click", (e)=>{ if(e.target===modal) closeModal(); });
-document.addEventListener("keydown", (e)=>{ if(e.key==="Escape") closeModal(); });
 
-spinBtn.onclick=()=>{
-  if(spinning)return;
-  spinning=true;
-  spinBtn.disabled=true;
-  result.textContent="spinnin…";
+/* ========= spin logic ========= */
+spinBtn.onclick = () => {
+  if(spinning) return;
+  spinning = true;
+  spinBtn.disabled = true;
+  result.textContent = "spinnin…";
 
-  const slice=TAU/NAMES.length;
-  const targetMid=(FIXED_INDEX+.5)*slice;
+  const slice = TAU / NAMES.length;
+  const targetMid = (FIXED_INDEX + 0.5) * slice;
 
-  // land on Guy Morgan (centered under pointer)
-  const final=(-Math.PI/2 - targetMid) + (7*TAU);
+  // pointer at top: -PI/2
+  const final = (-Math.PI/2 - targetMid) + (8 * TAU);
 
-  const start=performance.now();
-  const dur=3000;
-  const from=rot;
+  const start = performance.now();
+  const dur = 3100;
+  const from = rot;
 
-  const tick=t=>{
-    const p=Math.min(1,(t-start)/dur);
-    const eased = 1 - Math.pow(1-p,3);
-    rot=from+(final-from)*eased;
+  const tick = (t) => {
+    const p = Math.min(1, (t - start) / dur);
+    const eased = 1 - Math.pow(1 - p, 3);
+    rot = from + (final - from) * eased;
     draw();
 
-    if(p<1){
+    if(p < 1){
       requestAnimationFrame(tick);
     } else {
-      spinning=false;
-      spinBtn.disabled=false;
-      result.textContent=FIXED;
-      openModal();
+      spinning = false;
+      spinBtn.disabled = false;
+      result.textContent = FIXED;
+
+      // flash AFTER it lands
+      flashGuyMorgan();
+
+      // then jumpscare
+      showJumpscare();
     }
   };
+
   requestAnimationFrame(tick);
 };
 
-resetBtn.onclick=()=>{
-  rot=0;
+resetBtn.onclick = () => {
+  rot = 0;
   draw();
-  result.textContent="—";
-  closeModal();
+  result.textContent = "—";
+  spinning = false;
+  spinBtn.disabled = false;
+  modal.classList.remove("show");
+  flashText.classList.remove("show");
 };
 </script>
 </body>
